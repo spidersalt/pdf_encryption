@@ -2,7 +2,6 @@
 
 A secure, user-friendly Bash script for encrypting PDF files using qpdf with AES-256 encryption.
 
-```
   ┌────────────────────────────────────┐
   │                                    │
   │                     __     ___     │
@@ -16,7 +15,7 @@ A secure, user-friendly Bash script for encrypting PDF files using qpdf with AES
   │          \/_/\/_/                  │
   │                                    │
   └────────────────────────────────────┘
-```
+
 
 ## Features
 
