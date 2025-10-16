@@ -6,32 +6,7 @@ set -euo pipefail  # Exit on error, undefined variables, and pipe failures
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
 NC='\033[0m' # No Color
-
-# Display banner
-clear
-echo -e "${CYAN}"
-cat << "EOF"
-  ┌────────────────────────────────────┐
-  │                                    │
-  │                     __     ___     │
-  │                    /\ \  /'___\    │
-  │      __   _____    \_\ \/\ \__/    │
-  │    /'__`\/\ '__`\  /'_` \ \ ,__\   │
-  │   /\ \L\ \ \ \L\ \/\ \L\ \ \ \_/   │
-  │   \ \___, \ \ ,__/\ \___,_\ \_\    │
-  │    \/___/\ \ \ \/  \/__,_ /\/_/    │
-  │         \ \_\ \_\                  │
-  │          \/_/\/_/                  │
-  │                                    │
-  └────────────────────────────────────┘      
-EOF
-echo -e "${NC}"
-echo -e "${GREEN}Welcome to PDF Encryption Tool${NC}"
-echo "Secure your PDF files with password protection using qpdf"
-echo "=========================================================="
-echo
 
 # Function to print error messages
 error() {
@@ -48,13 +23,11 @@ warning() {
     echo -e "${YELLOW}WARNING: $1${NC}"
 }
 
-# Check if required commands are installed
-for cmd in qpdf file; do
-    if ! command -v "$cmd" &> /dev/null; then
-        error "$cmd is not installed. Please install it first."
-        exit 1
-    fi
-done
+# Check if qpdf is installed
+if ! command -v qpdf &> /dev/null; then
+    error "qpdf is not installed. Please install it first."
+    exit 1
+fi
 
 # Get source file with validation loop
 while true; do
@@ -136,7 +109,7 @@ if [[ -z "$filename" ]]; then
 fi
 
 # Sanitize filename (remove/replace unsafe characters)
-filename=$(echo "$filename" | tr -d '\n\r' | tr -cd '[:alnum:]._-' | tr ' ' '_')
+filename=$(echo "$filename" | tr -d '\n\r' | tr '/' '_')
 
 # Construct full output path
 output_file="$destination_path/${filename}.pdf"
