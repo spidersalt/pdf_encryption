@@ -80,7 +80,7 @@ sudo pacman -S qpdf file
 
 1. Download the script:
 ```bash
-curl -O https://github.com/spidersalt/pdf_encryption](https://github.com/spidersalt/pdf_encryption/releases/download/latest/qpdf_tool.sh
+curl -O https://github.com/spidersalt/pdf_encryption/releases/download/latest/qpdf_tool.sh
 ```
 
 2. Make it executable:
