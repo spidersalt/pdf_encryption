@@ -6,7 +6,32 @@ set -euo pipefail  # Exit on error, undefined variables, and pipe failures
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
 NC='\033[0m' # No Color
+
+# Display banner
+clear
+echo -e "${CYAN}"
+cat << "EOF"
+  ┌────────────────────────────────────┐
+  │                                    │
+  │                     __     ___     │
+  │                    /\ \  /'___\    │
+  │      __   _____    \_\ \/\ \__/    │
+  │    /'__`\/\ '__`\  /'_` \ \ ,__\   │
+  │   /\ \L\ \ \ \L\ \/\ \L\ \ \ \_/   │
+  │   \ \___, \ \ ,__/\ \___,_\ \_\    │
+  │    \/___/\ \ \ \/  \/__,_ /\/_/    │
+  │         \ \_\ \_\                  │
+  │          \/_/\/_/                  │
+  │                                    │
+  └────────────────────────────────────┘      
+EOF
+echo -e "${NC}"
+echo -e "${GREEN}Welcome to PDF Encryption Tool${NC}"
+echo "Secure your PDF files with password protection using qpdf"
+echo "=========================================================="
+echo
 
 # Function to print error messages
 error() {
@@ -23,11 +48,16 @@ warning() {
     echo -e "${YELLOW}WARNING: $1${NC}"
 }
 
-# Check if qpdf is installed
-if ! command -v qpdf &> /dev/null; then
-    error "qpdf is not installed. Please install it first."
-    exit 1
-fi
+# Check if required commands are installed
+for cmd in qpdf file; do
+    if ! command -v "$cmd" &> /dev/null; then
+        error "$cmd is not installed. Please install it first."
+        exit 1
+    fi
+done
+
+# Function to encrypt a single PDF
+encrypt_pdf() {
 
 # Get source file with validation loop
 while true; do
@@ -99,17 +129,22 @@ if [[ ! -w "$destination_path" ]]; then
     exit 1
 fi
 
-# Get filename
-echo "Enter filename (omit extension):"
-read -r filename
+# Get filename with validation loop
+while true; do
+    echo "Enter filename (omit extension):"
+    read -r filename
 
-if [[ -z "$filename" ]]; then
-    error "Filename cannot be empty."
-    exit 1
-fi
+    if [[ -z "$filename" ]]; then
+        error "Filename cannot be empty. Please enter a valid filename."
+        continue
+    fi
+    
+    # All validations passed
+    break
+done
 
 # Sanitize filename (remove/replace unsafe characters)
-filename=$(echo "$filename" | tr -d '\n\r' | tr '/' '_')
+filename=$(echo "$filename" | tr -d '\n\r' | tr -cd '[:alnum:]._-' | tr ' ' '_')
 
 # Construct full output path
 output_file="$destination_path/${filename}.pdf"
@@ -200,12 +235,42 @@ if qpdf --encrypt "$user_password" "$owner_password" 256 --modify=none -- "$sour
     echo "Output file: $output_file"
     echo
     ls -la "$output_file"
-    exit 0
+    return 0
 else
     # Clear password variables from memory even on failure
     unset owner_password
     unset user_password
     
     error "Failed to encrypt PDF. Check qpdf output above."
-    exit 1
+    return 1
 fi
+}
+
+# Run first encryption
+encrypt_pdf
+
+# Main program loop (only after first encryption)
+while true; do
+    echo
+    echo "=========================================================="
+    echo "PDF Encryption Menu:"
+    echo "  (0) Exit"
+    echo "  (1) Encrypt more files"
+    echo "=========================================================="
+    read -p "Choose an option: " choice
+    
+    case $choice in
+        0)
+            echo
+            success "Thank you for using PDF Encryption Tool!"
+            exit 0
+            ;;
+        1)
+            echo
+            encrypt_pdf
+            ;;
+        *)
+            error "Invalid option. Please choose 0 or 1."
+            ;;
+    esac
+done
