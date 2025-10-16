@@ -592,7 +592,7 @@ StartupNotify=true
 sudo chmod +x /usr/share/applications/qpdf_tool.desktop
 ```
 
-5 - **Place and Test**:
+**5 - Place and Test**:
 
 - **On Desktop**: Copy the .desktop file to your Desktop folder (~/Desktop/), or right-click desktop > "Create Launcher" in some DEs, and point to the script with terminal options.
 - **In Menu**: It should appear in your applications menu (search for "Encrypt Files with 7z"). Log out/in or run update-desktop-database if needed.
